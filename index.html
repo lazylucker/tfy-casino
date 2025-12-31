@@ -3,178 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFY Casino - Mini App</title>
+    <title>TFY Casino Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-            overflow-x: hidden;
+            color: white; min-height: 100vh;
         }
-        .container {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-        }
+        .container { max-width: 400px; margin: 0 auto; padding: 15px; }
         .header {
-            text-align: center;
-            margin-bottom: 20px;
-            background: rgba(255,255,255,0.1);
-            padding: 20px;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+            text-align: center; margin-bottom: 20px;
+            background: rgba(255,255,255,0.1); padding: 20px;
+            border-radius: 20px; backdrop-filter: blur(10px);
         }
-        .balance { font-size: 24px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
-        .vip-status { font-size: 14px; opacity: 0.9; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .balance { font-size: 26px; font-weight: bold; margin: 10px 0; color: #ffd700; }
+        .vip { font-size: 13px; opacity: 0.9; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
         .card {
-            background: rgba(255,255,255,0.15);
-            padding: 20px;
-            border-radius: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.12); padding: 18px;
+            border-radius: 15px; text-align: center; cursor: pointer;
+            transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2);
         }
-        .card:hover {
-            transform: translateY(-5px);
-            background: rgba(255,255,255,0.25);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-        }
-        .card-icon { font-size: 32px; margin-bottom: 10px; }
-        .card-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
-        .card-value { font-size: 18px; color: #ffd700; }
+        .card:active { transform: scale(0.95); }
+        .icon { font-size: 32px; margin-bottom: 8px; }
+        .title { font-size: 13px; font-weight: bold; }
+        .value { font-size: 16px; color: #ffd700; margin-top: 5px; }
         .btn {
+            width: 100%; padding: 12px; border: none;
+            border-radius: 20px; color: white; font-weight: bold;
+            cursor: pointer; font-size: 13px; margin: 8px 0;
             background: linear-gradient(45deg, #ff6b6b, #feca57);
-            border: none;
-            padding: 12px 24px;
-            border-radius: 25px;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin: 8px 0;
-            box-shadow: 0 4px 15px rgba(254,202,87,0.4);
+            transition: all 0.2s;
         }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(254,202,87,0.6); }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .btn:active { transform: scale(0.98); }
         .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 1000;
-            backdrop-filter: blur(5px);
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85); z-index: 1000;
         }
         .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(255,255,255,0.95);
-            border-radius: 20px;
-            padding: 25px;
-            max-width: 90%;
-            max-height: 90%;
-            overflow-y: auto;
-            color: #333;
-            max-width: 350px;
+            background: rgba(30,30,40,0.95);
+            border-radius: 20px; padding: 25px;
+            max-width: 360px; max-height: 85%;
+            overflow-y: auto; color: white;
         }
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
+        .close { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #999; }
+        h2 { text-align: center; margin-bottom: 20px; font-size: 20px; }
         .mines-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 5px;
-            margin: 20px 0;
-            max-height: 300px;
-            overflow: auto;
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            gap: 4px; margin: 15px 0;
         }
-        .mine-tile {
-            width: 45px;
-            height: 45px;
+        .tile {
+            width: 50px; height: 50px;
             background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.2s;
+            border-radius: 8px; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 20px; cursor: pointer;
             border: 2px solid rgba(255,255,255,0.3);
+            user-select: none;
         }
-        .mine-tile:hover:not(.opened):not(.bomb) {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        .mine-tile.opened { background: #f0f0f0 !important; color: #333; cursor: default; }
-        .mine-tile.bomb { background: #ff4444 !important; animation: shake 0.5s; cursor: default; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-3px); }
-            75% { transform: translateX(3px); }
-        }
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            margin: 10px 0;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4facfe, #00f2fe);
-            transition: width 0.3s ease;
-        }
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; font-size: 14px; }
+        .tile:active { transform: scale(0.95); }
+        .tile.locked { opacity: 0.5; cursor: default; }
+        .tile.treasure { background: #ffd700; color: #333; font-weight: bold; }
+        .tile.bomb { background: #ff4444; animation: boom 0.5s; }
+        @keyframes boom { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .progress { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 10px 0; overflow: hidden; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #4facfe, #00f2fe); }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 12px; }
+        .stat-item { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; text-align: center; }
         .leaderboard { max-height: 300px; overflow-y: auto; }
-        .leaderboard-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
-            margin-bottom: 8px;
-            border-radius: 10px;
-            font-size: 14px;
+        .lb-item {
+            display: flex; justify-content: space-between;
+            padding: 10px; background: rgba(255,255,255,0.08);
+            margin-bottom: 5px; border-radius: 8px; font-size: 13px;
         }
-        .farm-plant {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 12px;
-            background: rgba(0,255,0,0.2);
-            margin: 8px 0;
-            border-radius: 10px;
-            font-size: 14px;
+        .farm-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px; background: rgba(0,255,100,0.15);
+            margin: 8px 0; border-radius: 8px; font-size: 12px;
         }
-        .rarity-common { color: #90EE90; }
-        .rarity-gold { color: #FFD700; }
-        .rarity-diamond { color: #B9F2FF; }
-        .rarity-prismatic { color: #FF69B4; animation: glow 2s infinite; }
-        @keyframes glow {
-            0%, 100% { text-shadow: 0 0 5px currentColor; }
-            50% { text-shadow: 0 0 20px currentColor; }
-        }
-        h2 { margin-bottom: 20px; text-align: center; }
-        .small-btn { padding: 8px 16px !important; font-size: 12px !important; }
+        .farm-btn { padding: 6px 12px; font-size: 11px !important; }
     </style>
 </head>
 <body>
@@ -182,421 +94,335 @@
         <div class="header">
             <h1>🎰 TFY CASINO</h1>
             <div class="balance" id="balance">💎 1,000 TFY</div>
-            <div class="vip-status" id="vipStatus">🟢 Бронза</div>
+            <div class="vip" id="vip">🟢 Бронза</div>
         </div>
 
         <div class="grid">
-            <div class="card" onclick="showGame('mines')">
-                <div class="card-icon">🧨</div>
-                <div class="card-title">MINES</div>
-                <div class="card-value" id="minesMult">x1.00</div>
+            <div class="card" onclick="openMines()">
+                <div class="icon">🧨</div>
+                <div class="title">MINES</div>
+                <div class="value" id="minesMult">x1.00</div>
             </div>
-            <div class="card" onclick="showGame('farm')">
-                <div class="card-icon">🌿</div>
-                <div class="card-title">WEED FARM</div>
-                <div class="card-value" id="farmIncome">0 TFY/день</div>
+            <div class="card" onclick="openFarm()">
+                <div class="icon">🌿</div>
+                <div class="title">WEED FARM</div>
+                <div class="value" id="farmInc">0 TFY</div>
             </div>
-            <div class="card" onclick="showGame('mining')">
-                <div class="card-icon">⛏️</div>
-                <div class="card-title">MINING</div>
-                <div class="card-value" id="miningIncome">0.01 TFY/мин</div>
+            <div class="card" onclick="openMining()">
+                <div class="icon">⛏️</div>
+                <div class="title">MINING</div>
+                <div class="value" id="mineRate">0.01 TFY</div>
             </div>
-            <div class="card" onclick="showGame('cases')">
-                <div class="card-icon">🎡</div>
-                <div class="card-title">NFT CASES</div>
-                <div class="card-value" id="casePrice">100 TFY</div>
-            </div>
-        </div>
-
-        <div class="card" style="grid-column: span 2;">
-            <div class="card-title">📈 Пассивный доход</div>
-            <div class="card-value" id="passiveIncome">89 TFY/день</div>
-            <div class="progress-bar">
-                <div class="progress-fill" id="energyBar" style="width: 87%"></div>
+            <div class="card" onclick="openCases()">
+                <div class="icon">🎡</div>
+                <div class="title">NFT CASES</div>
+                <div class="value" id="casePrice">100 TFY</div>
             </div>
         </div>
 
-        <button class="btn" onclick="showGame('shop')" style="background: linear-gradient(45deg, #4facfe, #00f2fe);">🛒 NFT Магазин</button>
-        <button class="btn" onclick="showGame('leaderboard')" style="background: linear-gradient(45deg, #43e97b, #38f9d7);">🏆 Лидерборд</button>
-        <button class="btn" onclick="claimDaily()" style="background: linear-gradient(45deg, #fa709a, #fee140);">📦 Дейли бонус</button>
+        <button class="btn" onclick="openDaily()">📦 ДЕЙЛИ БОНУС</button>
+        <button class="btn" onclick="openLeaderboard()">🏆 ЛИДЕРБОРД</button>
+        <button class="btn" onclick="openShop()">🛒 МАГАЗИН</button>
     </div>
 
-    <div id="gameModal" class="modal">
+    <div id="modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
-            <div id="gameContent"></div>
+            <div id="content"></div>
         </div>
     </div>
 
     <script>
-        let gameData = {
+        let game = {
             balance: 1000,
-            mines: { opened: 0, bombs: 5, size: 25, multiplier: 1 },
-            farm: { seeds: 1, plants: [], upgrades: { water: false, light: false } },
-            mining: { rigs: [{ power: 0.01, energy: 100, lastUpdate: Date.now() }], upgrades: {} },
-            cases: { spins: 0, stickers: { common: 0, gold: 0, diamond: 0, prismatic: 0 } },
-            passiveIncome: 89,
-            dailyStreak: 1,
-            lastDaily: 0,
-            vip: 'bronze'
+            mines: { opened: 0, mult: 1, locked: false },
+            farm: { seeds: 1, plants: [], harvest: 0 },
+            mining: { power: 0.01, energy: 100, lastTime: Date.now() },
+            cases: { spins: 0, stickers: { c: 0, g: 0, d: 0, p: 0 } },
+            daily: 0,
+            streak: 1,
+            vip: '🟢 Бронза'
         };
-
-        let minesGrid = [];
 
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
 
-        function init() {
-            loadData();
-            updateUI();
-            setInterval(updateGameLoop, 1000);
-        }
+        setInterval(() => {
+            let now = Date.now();
+            let mins = (now - game.mining.lastTime) / 60000;
+            game.balance += game.mining.power * mins;
+            game.mining.lastTime = now;
+            save();
+            update();
+        }, 1000);
 
-        function updateGameLoop() {
-            updateMining();
-            updateUI();
-        }
+        load();
+        update();
 
-        function updateUI() {
-            document.getElementById('balance').textContent = `💎 ${formatNumber(gameData.balance)} TFY`;
-            document.getElementById('vipStatus').textContent = getVipStatus();
-            document.getElementById('passiveIncome').textContent = `${calculatePassiveIncome()} TFY/день`;
-            document.getElementById('minesMult').textContent = `x${gameData.mines.multiplier.toFixed(2)}`;
-            document.getElementById('casePrice').textContent = `${formatNumber(getCasePrice())} TFY`;
-            document.getElementById('energyBar').style.width = `${Math.max(0, gameData.mining.rigs[0].energy)}%`;
-            document.getElementById('miningIncome').textContent = `${gameData.mining.rigs[0].power.toFixed(2)} TFY/мин`;
-        }
-
-        function showGame(game) {
-            const content = document.getElementById('gameContent');
-            document.getElementById('gameModal').style.display = 'block';
+        function update() {
+            document.getElementById('balance').textContent = `💎 ${fmt(game.balance)} TFY`;
+            document.getElementById('minesMult').textContent = `x${game.mines.mult.toFixed(2)}`;
+            document.getElementById('casePrice').textContent = `${fmt(100 + game.cases.spins * 3.5)} TFY`;
+            let total = game.farm.plants.reduce((a,p) => a + p.gain, 0) + game.mining.power * 1440;
+            document.getElementById('farmInc').textContent = `${fmt(total)} TFY`;
+            document.getElementById('mineRate').textContent = `${game.mining.power.toFixed(2)} TFY`;
             
-            switch(game) {
-                case 'mines':
-                    content.innerHTML = `
-                        <h2>🧨 MINES</h2>
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            Мины: ${gameData.mines.bombs}/${gameData.mines.size} | 
-                            Множитель: x${gameData.mines.multiplier.toFixed(2)}
-                        </div>
-                        <div class="mines-grid" id="minesGrid"></div>
-                        <div style="margin-top: 20px;">
-                            <button class="btn" onclick="playMines()">Открыть клетку (-25 TFY)</button><br>
-                            <button class="btn" onclick="cashOutMines()">💰 Cash Out (+${Math.floor(gameData.mines.multiplier * 25)} TFY)</button>
-                        </div>
-                    `;
-                    createMinesGrid();
-                    break;
-                    
-                case 'farm':
-                    updateFarmUI();
-                    content.innerHTML = `
-                        <h2>🌿 WEED FARM</h2>
-                        <div style="text-align: center; margin-bottom: 20px;">
-                            Семечек: ${gameData.farm.seeds}/1 
-                            <button class="btn small-btn" onclick="claimSeed()" ${gameData.farm.seeds >= 1 ? 'disabled' : ''}>📦 Получить</button>
-                        </div>
-                        <div id="farmPlants"></div>
-                        <div style="margin-top: 20px;">
-                            <div class="stats-grid">
-                                <div>💧 Полив<br><span style="color: gold;">750 TFY</span></div>
-                                <div>☀️ Свет<br><span style="color: gold;">2.25K TFY</span></div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'mining':
-                    content.innerHTML = `
-                        <h2>⛏️ MINING TYCOON</h2>
-                        <div style="text-align: center;">
-                            <div>RIG #1: ${gameData.mining.rigs[0].power.toFixed(2)} TFY/мин</div>
-                            <div>Энергия: ${gameData.mining.rigs[0].energy.toFixed(0)}%</div>
-                            <button class="btn" onclick="startMining()" ${gameData.mining.rigs[0].energy >= 95 ? 'disabled' : ''}>▶️ Запустить</button>
-                        </div>
-                        <div style="margin-top: 20px;">
-                            <div class="stats-grid">
-                                <div>💻 GPU<br><span style="color: gold;">3.75K TFY</span></div>
-                                <div>❄️ Водянка<br><span style="color: gold;">12K TFY</span></div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'cases':
-                    content.innerHTML = `
-                        <h2>🎡 NFT CASES</h2>
-                        <div style="text-align: center;">
-                            <div>Прокрутка #${gameData.cases.spins + 1}</div>
-                            <div style="font-size: 16px; margin: 10px 0;">${formatNumber(getCasePrice())} TFY</div>
-                            <div style="font-size: 12px; opacity: 0.8;">🟢68% 🟡24% 🟣6% 🌈2%</div>
-                            <div style="font-size: 48px; margin: 20px 0;">🎡</div>
-                            <button class="btn" onclick="openCase()">🔓 ОТКРЫТЬ КЕЙС</button>
-                        </div>
-                        <div style="margin-top: 20px;">
-                            <div class="stats-grid">
-                                <div>🟢 ${gameData.cases.stickers.common}</div>
-                                <div>🟡 ${gameData.cases.stickers.gold}</div>
-                                <div>🟣 ${gameData.cases.stickers.diamond}</div>
-                                <div>🌈 ${gameData.cases.stickers.prismatic}</div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'shop':
-                    content.innerHTML = `
-                        <h2>🛒 NFT МАГАЗИН</h2>
-                        <div style="text-align: center;">
-                            <div class="stats-grid">
-                                <div>🟡 Золотой PM<br><span style="color: gold;">5K TFY</span></div>
-                                <div>💎 Брилл. Косяк<br><span style="color: gold;">25K TFY</span></div>
-                                <div>👑 Королевский Риг<br><span style="color: gold;">100K TFY</span></div>
-                                <div>🌈 Легенда<br><span style="color: gold;">500K TFY</span></div>
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'leaderboard':
-                    content.innerHTML = `
-                        <h2>🏆 ЛИДЕРБОРД</h2>
-                        <div class="leaderboard" id="leaderboardList"></div>
-                    `;
-                    showLeaderboard();
-                    break;
-            }
+            let stickers = game.cases.stickers.c + game.cases.stickers.g + game.cases.stickers.d + game.cases.stickers.p;
+            if(stickers >= 50) game.vip = '🌈 Легенда';
+            else if(stickers >= 20) game.vip = '🟣 Платина';
+            else if(stickers >= 5) game.vip = '🟡 Золото';
+            else game.vip = '🟢 Бронза';
+            document.getElementById('vip').textContent = game.vip;
         }
 
-        function createMinesGrid() {
-            const grid = document.getElementById('minesGrid');
-            minesGrid = [];
+        function openMines() {
+            let html = `<h2>🧨 MINES</h2>
+                <div style="text-align:center; margin-bottom:15px;">
+                    Множитель: x${game.mines.mult.toFixed(2)} | Открыто: ${game.mines.opened}/25
+                </div>
+                <div class="mines-grid" id="grid"></div>
+                <button class="btn" onclick="playMine()" ${game.mines.locked ? 'disabled' : ''}>ОТКРЫТЬ (-25 TFY)</button>
+                <button class="btn" onclick="cashOut()" ${game.mines.opened === 0 ? 'disabled' : ''}>💰 CASH OUT (+${Math.floor(game.mines.mult * 25)} TFY)</button>
+            `;
+            show(html);
+            makeMineGrid();
+        }
+
+        function makeMineGrid() {
+            let grid = document.getElementById('grid');
             grid.innerHTML = '';
-            for(let i = 0; i < gameData.mines.size; i++) {
-                const tile = document.createElement('div');
-                tile.className = 'mine-tile';
-                tile.dataset.index = i;
-                tile.onclick = () => openMineTile(parseInt(tile.dataset.index));
-                grid.appendChild(tile);
-                minesGrid.push(false);
+            for(let i = 0; i < 25; i++) {
+                let t = document.createElement('div');
+                t.className = 'tile ' + (game.mines.opened > i ? 'locked' : '');
+                t.textContent = i < game.mines.opened ? '💎' : '?';
+                grid.appendChild(t);
             }
         }
 
-        function openMineTile(index) {
-            if(gameData.balance < 25) {
-                alert('💸 Недостаточно TFY! Нужно 25');
-                return;
-            }
+        function playMine() {
+            if(game.balance < 25) { alert('Нужно 25 TFY'); return; }
+            if(game.mines.locked) { alert('Уже открыта!'); return; }
             
-            gameData.balance -= 25;
-            gameData.mines.opened++;
-            gameData.mines.multiplier = 1 + (gameData.mines.opened * 0.15);
+            game.balance -= 25;
+            game.mines.opened++;
+            game.mines.mult = 1 + (game.mines.opened * 0.15);
+
+            let isBomb = Math.random() < 0.25;
             
-            const tile = document.querySelector(`[data-index="${index}"]`);
-            const isBomb = Math.random() < (gameData.mines.bombs / (gameData.mines.size - gameData.mines.opened));
-            
-            if(isBomb || minesGrid[index]) {
-                tile.className = 'mine-tile bomb';
-                tile.textContent = '💣';
-                gameData.mines = { opened: 0, bombs: 5, size: 25, multiplier: 1 };
-                alert('💥 БАМ! Попалась мина!');
+            if(isBomb) {
+                let tiles = document.querySelectorAll('.tile');
+                tiles[game.mines.opened - 1].className = 'tile bomb';
+                tiles[game.mines.opened - 1].textContent = '💣';
+                alert('💥 ПОПАЛАСЬ МИНА!');
+                game.mines = { opened: 0, mult: 1, locked: false };
             } else {
-                tile.className = 'mine-tile opened';
-                tile.textContent = '💎';
-                minesGrid[index] = true;
-                
-                if(Math.random() < 0.02) {
-                    alert('🎫 +1 КАРТА СОКРОВИЩ!');
-                }
+                game.mines.locked = true;
+                let tiles = document.querySelectorAll('.tile');
+                tiles[game.mines.opened - 1].className = 'tile treasure';
+                tiles[game.mines.opened - 1].textContent = '💎';
+                if(Math.random() < 0.02) alert('🎫 +КАРТА СОКРОВИЩ!');
             }
-            saveData();
-            updateUI();
+            save();
+            update();
+            openMines();
         }
 
-        function cashOutMines() {
-            if(gameData.mines.opened === 0) return;
-            const win = Math.floor(gameData.mines.multiplier * 25);
-            gameData.balance += win;
-            alert(`💰 ВЫИГРЫШ: +${win} TFY! (x${gameData.mines.multiplier.toFixed(2)})`);
-            gameData.mines = { opened: 0, bombs: 5, size: 25, multiplier: 1 };
+        function cashOut() {
+            if(game.mines.opened === 0) return;
+            let win = Math.floor(game.mines.mult * 25);
+            game.balance += win;
+            alert(`💰 +${win} TFY!`);
+            game.mines = { opened: 0, mult: 1, locked: false };
+            save();
+            update();
             closeModal();
-            saveData();
-            updateUI();
         }
 
-        function getCasePrice() {
-            return Math.floor(100 + (gameData.cases.spins * 3.5));
+        function openFarm() {
+            let plants = game.farm.plants.map((p, i) => 
+                `<div class="farm-item">
+                    <span>${p.emoji} ${p.name}: +${p.gain} TFY</span>
+                    <button class="btn farm-btn" onclick="harvest(${i})">Собрать</button>
+                </div>`
+            ).join('');
+
+            let html = `<h2>🌿 WEED FARM</h2>
+                <div style="text-align:center; margin-bottom:15px;">
+                    Семечек: ${game.farm.seeds}/1
+                    <button class="btn farm-btn" onclick="plantSeed()" ${game.farm.seeds < 1 ? 'disabled' : ''}>Посадить</button>
+                </div>
+                <div>${plants || '<div style="text-align:center; opacity:0.7;">Нет растений</div>'}</div>
+            `;
+            show(html);
+        }
+
+        function plantSeed() {
+            if(game.farm.seeds < 1) return;
+            game.farm.seeds = 0;
+            game.farm.plants.push({ emoji: '🌿', name: 'Кустик', gain: 50 });
+            alert('🌱 Посажено!');
+            save();
+            update();
+            openFarm();
+        }
+
+        function harvest(i) {
+            game.balance += game.farm.plants[i].gain;
+            game.farm.plants.splice(i, 1);
+            game.farm.seeds = 1;
+            alert(`✅ +${game.farm.plants[i]?.gain || 50} TFY`);
+            save();
+            update();
+            openFarm();
+        }
+
+        function openMining() {
+            let html = `<h2>⛏️ MINING</h2>
+                <div style="text-align:center;">
+                    <div style="margin:15px 0;">RIG: ${game.mining.power.toFixed(2)} TFY/мин</div>
+                    <div>Энергия: ${game.mining.energy.toFixed(0)}%</div>
+                    <div class="progress"><div class="progress-bar" style="width:${game.mining.energy}%"></div></div>
+                    <button class="btn" onclick="restartMine()">▶️ ЗАПУСТИТЬ</button>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">💻 GPU<br>3.75K TFY</div>
+                    <div class="stat-item">❄️ Водянка<br>12K TFY</div>
+                </div>
+            `;
+            show(html);
+        }
+
+        function restartMine() {
+            game.mining.energy = 100;
+            alert('⛏️ Запущено!');
+            save();
+            update();
+        }
+
+        function openCases() {
+            let html = `<h2>🎡 NFT CASES</h2>
+                <div style="text-align:center;">
+                    <div style="margin:10px 0;">Цена: ${fmt(100 + game.cases.spins * 3.5)} TFY</div>
+                    <div style="font-size:12px; opacity:0.8;">🟢68% 🟡24% 🟣6% 🌈2%</div>
+                    <div style="font-size:48px; margin:20px 0; animation: spin 2s linear infinite;">🎡</div>
+                    <button class="btn" onclick="openCase()">🔓 ОТКРЫТЬ</button>
+                </div>
+                <div class="stats">
+                    <div class="stat-item">🟢 ${game.cases.stickers.c}</div>
+                    <div class="stat-item">🟡 ${game.cases.stickers.g}</div>
+                    <div class="stat-item">🟣 ${game.cases.stickers.d}</div>
+                    <div class="stat-item">🌈 ${game.cases.stickers.p}</div>
+                </div>
+            `;
+            show(html);
         }
 
         function openCase() {
-            const price = getCasePrice();
-            if(gameData.balance < price) {
-                alert(`💸 Нужно ${formatNumber(price)} TFY!`);
-                return;
-            }
+            let price = 100 + game.cases.spins * 3.5;
+            if(game.balance < price) { alert(`Нужно ${fmt(price)} TFY`); return; }
             
-            gameData.balance -= price;
-            gameData.cases.spins++;
+            game.balance -= price;
+            game.cases.spins++;
             
-            const rand = Math.random();
-            let rarity;
+            let r = Math.random();
+            let type;
+            if(r < 0.68) type = 'c';
+            else if(r < 0.92) type = 'g';
+            else if(r < 0.98) type = 'd';
+            else type = 'p';
             
-            if(rand < 0.68) rarity = 'common';
-            else if(rand < 0.92) rarity = 'gold';
-            else if(rand < 0.98) rarity = 'diamond';
-            else rarity = 'prismatic';
-            
-            gameData.cases.stickers[rarity]++;
-            alert(`🎉 ${getRarityName(rarity).toUpperCase()} НАКЛЕЙКА! +${getStickerBonus(rarity)}% бонус`);
-            saveData();
-            updateUI();
+            game.cases.stickers[type]++;
+            let names = { c: '🟢 Обычная', g: '🟡 Золотая', d: '🟣 Брилл', p: '🌈 Легенда' };
+            alert(`🎉 ${names[type]}!`);
+            save();
+            update();
+            openCases();
         }
 
-        function getRarityName(rarity) {
-            const names = {
-                common: '🟢 Обычная',
-                gold: '🟡 Золотая', 
-                diamond: '🟣 Бриллиантовая',
-                prismatic: '🌈 Призматическая'
-            };
-            return names[rarity];
-        }
-
-        function getStickerBonus(rarity) {
-            const bonuses = { common: 1, gold: 5, diamond: 25, prismatic: 100 };
-            return bonuses[rarity];
+        function openDaily() {
+            let now = Date.now();
+            let canClaim = (now - game.daily) > 86400000;
+            
+            let html = `<h2>📦 ДЕЙЛИ</h2>
+                <div style="text-align:center; margin:20px 0;">
+                    ${canClaim ? `
+                        <button class="btn" onclick="claimDaily()">✅ ПОЛУЧИТЬ</button>
+                        <div style="margin-top:15px; font-size:14px;">
+                            +${50 * game.streak} TFY<br>
+                            Стрик: ${game.streak}/30
+                        </div>
+                    ` : `
+                        <div style="opacity:0.7;">Доступно завтра</div>
+                    `}
+                </div>
+            `;
+            show(html);
         }
 
         function claimDaily() {
-            const now = Date.now();
-            if(now - gameData.lastDaily < 86400000) {
-                alert('⏰ Дейли доступен раз в 24 часа!');
-                return;
-            }
+            game.balance += 50 * game.streak;
+            game.daily = Date.now();
+            game.streak = Math.min(game.streak + 1, 30);
+            game.farm.seeds = 1;
+            alert(`📦 +${50 * game.streak} TFY!`);
+            save();
+            update();
+            closeModal();
+        }
+
+        function openLeaderboard() {
+            let leaders = [
+                { name: '@crypto_king', score: 125000 },
+                { name: '@weedlord', score: 87450 },
+                { name: '@minerpro', score: 45230 },
+                { name: '@ты', score: Math.floor(game.balance) }
+            ].sort((a,b) => b.score - a.score);
             
-            const bonus = 50 * gameData.dailyStreak;
-            gameData.balance += bonus;
-            gameData.lastDaily = now;
-            gameData.dailyStreak = Math.min(gameData.dailyStreak + 1, 30);
-            gameData.farm.seeds = 1;
-            
-            alert(`📦 ДЕЙЛИ БОНУС!\n+${bonus} TFY\nСтрик: ${gameData.dailyStreak}/30`);
-            saveData();
-            updateUI();
+            let html = `<h2>🏆 ЛИДЕРБОРД</h2><div class="leaderboard">`;
+            let medals = ['🥇', '🥈', '🥉'];
+            leaders.forEach((l, i) => {
+                html += `<div class="lb-item"><span>${medals[i] || (i+1)+'.'} ${l.name}</span><span>${fmt(l.score)} TFY</span></div>`;
+            });
+            html += '</div>';
+            show(html);
         }
 
-        function claimSeed() {
-            gameData.farm.seeds = 1;
-            alert('🌱 Семечко получено!');
-            saveData();
-            updateFarmUI();
-        }
-
-        function updateFarmUI() {
-            const plantsDiv = document.getElementById('farmPlants');
-            plantsDiv.innerHTML = gameData.farm.plants.length ? 
-                gameData.farm.plants.map((plant, index) => `
-                    <div class="farm-plant">
-                        <span>${plant.emoji}</span>
-                        <span>${plant.name} → ${plant.income} TFY</span>
-                        <button class="btn small-btn" onclick="collectPlant(${index})">Собрать</button>
-                    </div>
-                `).join('') : '<div style="text-align:center; opacity:0.7;">Нет растений<br>Посади семечко!</div>';
-        }
-
-        function collectPlant(index) {
-            const plant = gameData.farm.plants[index];
-            gameData.balance += plant.income;
-            gameData.farm.plants.splice(index, 1);
-            alert(`🌿 Собран урожай: +${plant.income} TFY`);
-            saveData();
-            updateFarmUI();
-            updateUI();
-        }
-
-        function startMining() {
-            if(gameData.mining.rigs[0].energy >= 95) {
-                alert('⚡ Энергия почти полная!');
-                return;
-            }
-            gameData.mining.rigs[0].energy = 100;
-            gameData.mining.rigs[0].lastUpdate = Date.now();
-            alert('⛏️ Майнинг запущен!');
-            saveData();
-            updateUI();
-        }
-
-        function updateMining() {
-            const rig = gameData.mining.rigs[0];
-            const now = Date.now();
-            const elapsed = (now - rig.lastUpdate) / 1000 / 60; // minutes
-            rig.energy = Math.max(0, rig.energy - elapsed * 0.139); // 12h full drain
-            if(rig.energy > 0) {
-                gameData.balance += rig.power * elapsed;
-            }
-            rig.lastUpdate = now;
-            saveData();
-        }
-
-        function calculatePassiveIncome() {
-            let income = 0;
-            gameData.farm.plants.forEach(p => income += p.income);
-            income += gameData.mining.rigs[0].power * 60 * 24;
-            return Math.floor(income);
-        }
-
-        function showLeaderboard() {
-            const list = document.getElementById('leaderboardList');
-            const demoData = [
-                { name: '@crypto_king', score: 125000, vip: '🌈' },
-                { name: '@weedlord', score: 87450, vip: '🟣' },
-                { name: '@minerpro', score: 45230, vip: '🟡' },
-                { name: '@lazylucker', score: gameData.balance, vip: getVipStatus().slice(0,2) }
-            ];
-            list.innerHTML = demoData.map((player, i) => `
-                <div class="leaderboard-item">
-                    <span>${['🥇','🥈','🥉','4️⃣'][i]} ${player.name} ${player.vip}</span>
-                    <span>${formatNumber(player.score)} TFY</span>
+        function openShop() {
+            let html = `<h2>🛒 МАГАЗИН</h2>
+                <div class="stats">
+                    <div class="stat-item">🟡 PM<br>5K TFY</div>
+                    <div class="stat-item">💎 Косяк<br>25K TFY</div>
+                    <div class="stat-item">👑 Риг<br>100K TFY</div>
+                    <div class="stat-item">🌈 Легенда<br>500K TFY</div>
                 </div>
-            `).join('');
+            `;
+            show(html);
         }
 
-        function formatNumber(num) {
-            if(num >= 1000000) return (num/1000000).toFixed(1) + 'M';
-            if(num >= 1000) return (num/1000).toFixed(1) + 'K';
-            return Math.floor(num).toString();
+        function show(html) {
+            document.getElementById('content').innerHTML = html;
+            document.getElementById('modal').style.display = 'block';
         }
 
-        function getVipStatus() {
-            const stickers = Object.values(gameData.cases.stickers).reduce((a,b)=>a+b,0);
-            if(stickers >= 50) return '🌈 Легенда';
-            if(stickers >= 20) return '🟣 Платина';
-            if(stickers >= 5) return '🟡 Золото';
-            return '🟢 Бронза';
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
         }
 
-        function saveData() { 
-            localStorage.setItem('tfyCasino', JSON.stringify(gameData)); 
+        function fmt(n) {
+            if(n >= 1000000) return (n/1000000).toFixed(1) + 'M';
+            if(n >= 1000) return (n/1000).toFixed(1) + 'K';
+            return Math.floor(n).toString();
         }
 
-        function loadData() {
-            try {
-                const saved = localStorage.getItem('tfyCasino');
-                if(saved) {
-                    const loaded = JSON.parse(saved);
-                    gameData = { ...gameData, ...loaded };
-                    gameData.mining.rigs[0].lastUpdate = loaded.mining?.rigs?.[0]?.lastUpdate || Date.now();
-                }
-            } catch(e) {
-                console.log('Load error, using defaults');
-            }
+        function save() {
+            localStorage.setItem('tfy', JSON.stringify(game));
         }
 
-        function closeModal() { 
-            document.getElementById('gameModal').style.display = 'none'; 
+        function load() {
+            let saved = localStorage.getItem('tfy');
+            if(saved) game = JSON.parse(saved);
+            game.mining.lastTime = Date.now();
         }
-
-        init();
     </script>
 </body>
 </html>
