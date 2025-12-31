@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TFY Casino - Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .balance {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+        .vip-status {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .card {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            background: rgba(255,255,255,0.25);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .card-value {
+            font-size: 18px;
+            color: #ffd700;
+        }
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #feca57);
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin: 10px 0;
+            box-shadow: 0 8px 25px rgba(254,202,87,0.4);
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(254,202,87,0.6);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            color: #333;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+        .mines-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+            margin: 20px 0;
+        }
+        .mine-tile {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        .mine-tile:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .mine-tile.opened {
+            background: #f0f0f0;
+            color: #333;
+        }
+        .mine-tile.bomb {
+            background: #ff4444 !important;
+            animation: shake 0.5s;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 0.3s ease;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        .leaderboard {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            margin-bottom: 5px;
+            border-radius: 10px;
+        }
+        .wheel-spin {
+            animation: spin 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(1440deg); }
+        }
+        .rarity-common { color: #90EE90; }
+        .rarity-gold { color: #FFD700; }
+        .rarity-diamond { color: #B9F2FF; }
+        .rarity-prismatic { color: #FF69B4; animation: glow 2s infinite; }
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 5px currentColor; }
+            50% { text-shadow: 0 0 20px currentColor; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎰 TFY CASINO</h1>
+            <div class="balance" id="balance">💎 1,000 TFY</div>
+            <div class="vip-status" id="vipStatus">🟢 Бронза</div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid">
+            <div class="card" onclick="showGame('mines')">
+                <div class="card-icon">🧨</div>
+                <div class="card-title">MINES</div>
+                <div class="card-value" id="minesMult">x1.00</div>
+            </div>
+            <div class="card" onclick="showGame('farm')">
+                <div class="card-icon">🌿</div>
+                <div class="card-title">WEED FARM</div>
+                <div class="card-value" id="farmIncome">25 TFY/день</div>
+            </div>
+            <div class="card" onclick="showGame('mining')">
+                <div class="card-icon">⛏️</div>
+                <div class="card-title">MINING</div>
+                <div class="card-value" id="miningIncome">0.01 TFY/мин</div>
+            </div>
+            <div class="card" onclick="showGame('cases')">
+                <div class="card-icon">🎡</div>
+                <div class="card-title">NFT CASES</div>
+                <div class="card-value" id="casePrice">100 TFY</div>
+            </div>
+        </div>
+
+        <!-- Passive Income -->
+        <div class="card" style="grid-column: span 2;">
+            <div class="card-title">📈 Пассивный доход</div>
+            <div class="card-value" id="passiveIncome">89 TFY/день</div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="energyBar" style="width: 87%"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <button class="btn" onclick="showGame('shop')">🛒 NFT Магазин</button>
+        <button class="btn" onclick="showGame('leaderboard')">🏆 Лидерборд</button>
+        <button class="btn" onclick="claimDaily()">📦 Дейли бонус</button>
+    </div>
+
+    <!-- Modals -->
+    <div id="gameModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="gameContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game Data
+        let gameData = {
+            balance: 1000,
+            mines: { opened: 0, bombs: 5, size: 25, multiplier: 1 },
+            farm: { seeds: 1, plants: [], upgrades: {} },
+            mining: { rigs: [{ power: 0.01, energy: 100 }], upgrades: {} },
+            cases: { spins: 0, stickers: { common: 0, gold: 0, diamond: 0, prismatic: 0 } },
+            passiveIncome: 89,
+            dailyStreak: 1,
+            lastDaily: 0,
+            vip: 'bronze'
+        };
+
+        // Telegram WebApp
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand();
+
+        // Init
+        function init() {
+            loadData();
+            updateUI();
+            setInterval(updateUI, 1000);
+        }
+
+        // Update UI
+        function updateUI() {
+            document.getElementById('balance').textContent = `💎 ${formatNumber(gameData.balance)} TFY`;
+            document.getElementById('vipStatus').textContent = getVipStatus();
+            document.getElementById('passiveIncome').textContent = `${gameData.passiveIncome} TFY/день`;
+            document.getElementById('minesMult').textContent = `x${gameData.mines.multiplier.toFixed(2)}`;
+            document.getElementById('casePrice').textContent = `${formatNumber(getCasePrice())} TFY`;
+            document.getElementById('energyBar').style.width = `${Math.min(gameData.mining.rigs[0].energy, 100)}%`;
+        }
+
+        // Show Game Modal
+        function showGame(game) {
+            const content = document.getElementById('gameContent');
+            document.getElementById('gameModal').style.display = 'block';
+            
+            switch(game) {
+                case 'mines':
+                    content.innerHTML = `
+                        <h2>🧨 MINES</h2>
+                        <div>Мины: ${gameData.mines.bombs}/${gameData.mines.size} | Множитель: x${gameData.mines.multiplier.toFixed(2)}</div>
+                        <div class="mines-grid" id="minesGrid"></div>
+                        <div style="margin: 20px 0;">
+                            <button class="btn" onclick="playMines()">Открыть клетку (25 TFY)</button>
+                            <button class="btn" onclick="cashOutMines()">💰 Cash Out (+${Math.floor(gameData.mines.multiplier * 25)} TFY)</button>
+                        </div>
+                    `;
+                    createMinesGrid();
+                    break;
+                case 'cases':
+                    content.innerHTML = `
+                        <h2>🎡 NFT CASES</h2>
+                        <div>Прокрутка #${gameData.cases.spins + 1} | Цена: ${formatNumber(getCasePrice())} TFY</div>
+                        <div style="font-size: 12px; margin: 10px 0;">🟢68% 🟡24% 🟣6% 🌈2%</div>
+                        <div style="text-align: center; margin: 20px 0;">
+                            <div style="font-size: 48px; animation: spin 2s infinite linear;">🎡</div>
+                        </div>
+                        <button class="btn" onclick="openCase()">🔓 ОТКРЫТЬ КЕЙС</button>
+                        <div class="stats-grid">
+                            <div>🟢 ${gameData.cases.stickers.common}</div>
+                            <div>🟡 ${gameData.cases.stickers.gold}</div>
+                            <div>🟣 ${gameData.cases.stickers.diamond}</div>
+                            <div>🌈 ${gameData.cases.stickers.prismatic}</div>
+                        </div>
+                    `;
+                    break;
+                case 'leaderboard':
+                    content.innerHTML = `
+                        <h2>🏆 ЛИДЕРБОРД</h2>
+                        <div class="leaderboard" id="leaderboardList"></div>
+                    `;
+                    showLeaderboard();
+                    break;
+            }
+        }
+
+        // Mines Game
+        function createMinesGrid() {
+            const grid = document.getElementById('minesGrid');
+            grid.innerHTML = '';
+            for(let i = 0; i < gameData.mines.size; i++) {
+                const tile = document.createElement('div');
+                tile.className = 'mine-tile';
+                tile.onclick = () => openMineTile(i);
+                grid.appendChild(tile);
+            }
+        }
+
+        function openMineTile(index) {
+            if(gameData.balance < 25) return alert('Недостаточно TFY!');
+            
+            gameData.balance -= 25;
+            gameData.mines.opened++;
+            gameData.mines.multiplier = 1 + (gameData.mines.opened * 0.15);
+            
+            const tile = document.querySelectorAll('.mine-tile')[index];
+            const isBomb = Math.random() < (gameData.mines.bombs / gameData.mines.size);
+            
+            if(isBomb) {
+                tile.className = 'mine-tile bomb';
+                tile.textContent = '💣';
+                gameData.mines = { opened: 0, bombs: 5, size: 25, multiplier: 1 };
+                alert('💥 БАМ! Проиграл!');
+            } else {
+                tile.className = 'mine-tile opened';
+                tile.textContent = '💎';
+                
+                // Treasure card drop (2% chance)
+                if(Math.random() < 0.02) {
+                    alert('🎫 КАРТА СОКРОВИЩ! +1');
+                }
+            }
+            saveData();
+            updateUI();
+        }
+
+        function cashOutMines() {
+            const win = Math.floor(gameData.mines.multiplier * 25);
+            gameData.balance += win;
+            alert(`💰 ВЫИГРАЛ: +${win} TFY!`);
+            gameData.mines = { opened: 0, bombs: 5, size: 25, multiplier: 1 };
+            closeModal();
+            saveData();
+            updateUI();
+        }
+
+        // Cases
+        function getCasePrice() {
+            return 100 + (gameData.cases.spins * 3.5);
+        }
+
+        function openCase() {
+            const price = getCasePrice();
+            if(gameData.balance < price) return alert('Недостаточно TFY!');
+            
+            gameData.balance -= price;
+            gameData.cases.spins++;
+            
+            const rarities = ['common', 'gold', 'diamond', 'prismatic'];
+            const chances = [0.68, 0.24, 0.06, 0.02];
+            const rand = Math.random();
+            let rarity = 'common';
+            
+            if(rand < chances[0]) rarity = 'common';
+            else if(rand < chances[0] + chances[1]) rarity = 'gold';
+            else if(rand < chances[0] + chances[1] + chances[2]) rarity = 'diamond';
+            else rarity = 'prismatic';
+            
+            gameData.cases.stickers[rarity]++;
+            alert(`🎉 ${getRarityName(rarity).toUpperCase()} НАКЛЕЙКА!`);
+            
+            saveData();
+            updateUI();
+        }
+
+        function getRarityName(rarity) {
+            const names = {
+                common: '🟢 Обычная',
+                gold: '🟡 Золотая',
+                diamond: '🟣 Бриллиантовая',
+                prismatic: '🌈 Призматическая'
+            };
+            return names[rarity];
+        }
+
+        // Daily Bonus
+        function claimDaily() {
+            const now = Date.now();
+            if(now - gameData.lastDaily < 86400000) {
+                return alert('Дейли уже получен! Завтра снова!');
+            }
+            
+            gameData.balance += 50 * gameData.dailyStreak;
+            gameData.lastDaily = now;
+            gameData.dailyStreak = Math.min(gameData.dailyStreak + 1, 30);
+            gameData.farm.seeds = Math.min(gameData.farm.seeds + 1, 1);
+            
+            alert(`📦 ДЕЙЛИ: +${50 * gameData.dailyStreak} TFY (стрик: ${gameData.dailyStreak})`);
+            saveData();
+            updateUI();
+        }
+
+        // Leaderboard
+        function showLeaderboard() {
+            const list = document.getElementById('leaderboardList');
+            const demoData = [
+                { name: '@crypto_king', score: 125000, vip: '🌈' },
+                { name: '@weedlord', score: 87450, vip: '🟣' },
+                { name: '@minerpro', score: 45230, vip: '🟡' },
+                { name: '@ТЫ', score: gameData.balance, vip: getVipStatus().slice(0,2) }
+            ];
+            
+            list.innerHTML = demoData.map((player, i) => `
+                <div class="leaderboard-item">
+                    <span>${['🥇','🥈','🥉'][i] || `${i+1}.`} ${player.name} ${player.vip}</span>
+                    <span>${formatNumber(player.score)} TFY</span>
+                </div>
+            `).join('');
+        }
+
+        // Utils
+        function formatNumber(num) {
+            if(num >= 1000) return (num/1000).toFixed(1) + 'K';
+            return num.toString();
+        }
+
+        function getVipStatus() {
+            const stickers = Object.values(gameData.cases.stickers).reduce((a,b)=>a+b,0);
+            if(stickers >= 50) return '🌈 Легенда';
+            if(stickers >= 20) return '🟣 Платина';
+            if(stickers >= 5) return '🟡 Золото';
+            return '🟢 Бронза';
+        }
+
+        // Storage
+        function saveData() {
+            localStorage.setItem('tfyCasino', JSON.stringify(gameData));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('tfyCasino');
+            if(saved) {
+                gameData = { ...gameData, ...JSON.parse(saved) };
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('gameModal').style.display = 'none';
+        }
+
+        // Init
+        init();
+    </script>
+</body>
+</html>
