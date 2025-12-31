@@ -3,560 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TFY Casino Mini App</title>
+    <title>TFY Casino</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, sans-serif;
+            font-family: Arial, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white; min-height: 100vh; overflow-x: hidden;
+            color: white;
+            min-height: 100vh;
         }
-        .container { max-width: 400px; margin: 0 auto; padding: 15px; min-height: 100vh; }
+        .container { max-width: 400px; margin: 0 auto; padding: 15px; }
         .header {
-            text-align: center; margin-bottom: 20px;
-            background: rgba(255,255,255,0.1); padding: 20px;
-            border-radius: 20px; backdrop-filter: blur(10px);
+            text-align: center;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
         }
-        h1 { font-size: 28px; margin-bottom: 10px; }
-        .balance { font-size: 26px; font-weight: bold; margin: 10px 0; color: #ffd700; }
-        .vip { font-size: 13px; opacity: 0.9; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .balance { font-size: 28px; font-weight: bold; color: #ffd700; margin: 10px 0; }
+        .vip { font-size: 14px; opacity: 0.9; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px; }
         .card {
-            background: rgba(255,255,255,0.12); padding: 18px;
-            border-radius: 15px; text-align: center; cursor: pointer;
-            transition: all 0.3s; border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid rgba(255,255,255,0.3);
         }
-        .card:active { transform: scale(0.95); opacity: 0.8; }
-        .icon { font-size: 32px; margin-bottom: 8px; }
-        .title { font-size: 13px; font-weight: bold; }
-        .value { font-size: 16px; color: #ffd700; margin-top: 5px; }
+        .card:hover { background: rgba(255,255,255,0.25); }
+        .card:active { transform: scale(0.95); }
+        .icon { font-size: 32px; }
+        .title { font-size: 14px; margin: 5px 0; }
+        .value { font-size: 18px; color: #ffd700; font-weight: bold; }
         .btn {
-            width: 100%; padding: 12px; border: none;
-            border-radius: 20px; color: white; font-weight: bold;
-            cursor: pointer; font-size: 13px; margin: 8px 0;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 15px;
             background: linear-gradient(45deg, #ff6b6b, #feca57);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 8px 0;
             transition: all 0.2s;
         }
+        .btn:hover { opacity: 0.9; }
         .btn:active { transform: scale(0.98); }
         .btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .modal {
-            display: none; position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.85); z-index: 1000;
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            padding: 20px;
+            overflow-y: auto;
         }
         .modal-content {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(30,30,40,0.95);
-            border-radius: 20px; padding: 25px;
-            max-width: 360px; max-height: 85%;
-            overflow-y: auto; color: white;
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 25px;
+            max-width: 360px;
+            margin: 50px auto;
+            color: white;
+            position: relative;
         }
-        .close { position: absolute; top: 10px; right: 15px; font-size: 28px; cursor: pointer; color: #999; }
-        h2 { text-align: center; margin-bottom: 20px; font-size: 20px; }
-        .info { text-align: center; margin: 15px 0; font-size: 14px; opacity: 0.9; }
-        .mines-grid {
-            display: grid; grid-template-columns: repeat(5, 1fr);
-            gap: 4px; margin: 15px 0;
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 30px;
+            cursor: pointer;
+            color: #aaa;
         }
+        h2 { text-align: center; margin-bottom: 20px; font-size: 22px; }
+        .info { text-align: center; margin: 15px 0; font-size: 14px; }
+        .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin: 15px 0; }
         .tile {
-            width: 50px; height: 50px;
+            width: 50px;
+            height: 50px;
             background: linear-gradient(45deg, #667eea, #764ba2);
-            border-radius: 8px; display: flex;
-            align-items: center; justify-content: center;
-            font-size: 20px; cursor: pointer;
             border: 2px solid rgba(255,255,255,0.3);
-            user-select: none; transition: all 0.2s;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .tile:active:not(.opened):not(.bomb) { transform: scale(0.95); }
-        .tile.opened { background: #4ade80; color: #333; cursor: default; }
-        .tile.bomb { background: #ff4444; color: white; cursor: default; }
-        .progress { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 3px; margin: 10px 0; overflow: hidden; }
-        .progress-bar { height: 100%; background: linear-gradient(90deg, #4facfe, #00f2fe); transition: width 0.3s; }
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; font-size: 12px; }
-        .stat-item { background: rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; text-align: center; }
-        .leaderboard { max-height: 300px; overflow-y: auto; }
-        .lb-item {
-            display: flex; justify-content: space-between;
-            padding: 10px; background: rgba(255,255,255,0.08);
-            margin-bottom: 5px; border-radius: 8px; font-size: 13px;
-        }
+        .tile:active { transform: scale(0.95); }
+        .tile.opened { background: #4ade80; }
+        .tile.bomb { background: #ff4444; }
+        .farm-list { margin: 15px 0; }
         .farm-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 10px; background: rgba(0,255,100,0.15);
-            margin: 8px 0; border-radius: 8px; font-size: 12px;
+            background: rgba(0,255,100,0.15);
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .farm-btn { padding: 6px 12px; font-size: 11px !important; margin: 0 !important; }
-        .btn-small { width: auto; padding: 8px 16px; font-size: 12px; }
+        .lb-list { max-height: 300px; overflow-y: auto; }
+        .lb-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+        .stat { background: rgba(255,255,255,0.1); padding: 12px; text-align: center; border-radius: 8px; }
+        .btn-sm { width: auto; padding: 8px 16px; font-size: 12px; margin: 0 5px; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
             <h1>🎰 TFY CASINO</h1>
-            <div class="balance" id="balance">💎 1,000 TFY</div>
-            <div class="vip" id="vip">🟢 Бронза</div>
+            <div class="balance" id="bal">💎 1,000 TFY</div>
+            <div class="vip" id="vipStatus">🟢 Бронза</div>
         </div>
 
         <div class="grid">
-            <div class="card" onclick="openMines()">
+            <div class="card" id="minesCard">
                 <div class="icon">🧨</div>
                 <div class="title">MINES</div>
-                <div class="value" id="minesMult">x1.00</div>
+                <div class="value" id="minesVal">x1.00</div>
             </div>
-            <div class="card" onclick="openFarm()">
+            <div class="card" id="farmCard">
                 <div class="icon">🌿</div>
-                <div class="title">WEED FARM</div>
-                <div class="value" id="farmInc">0 TFY</div>
+                <div class="title">FARM</div>
+                <div class="value" id="farmVal">0 TFY</div>
             </div>
-            <div class="card" onclick="openMining()">
+            <div class="card" id="miningCard">
                 <div class="icon">⛏️</div>
                 <div class="title">MINING</div>
-                <div class="value" id="mineRate">0.01 TFY</div>
+                <div class="value" id="miningVal">0.01</div>
             </div>
-            <div class="card" onclick="openCases()">
+            <div class="card" id="casesCard">
                 <div class="icon">🎡</div>
-                <div class="title">NFT CASES</div>
-                <div class="value" id="casePrice">100 TFY</div>
+                <div class="title">CASES</div>
+                <div class="value" id="casesVal">100</div>
             </div>
         </div>
 
-        <button class="btn" onclick="openDaily()">📦 ДЕЙЛИ БОНУС</button>
-        <button class="btn" onclick="openLeaderboard()">🏆 ЛИДЕРБОРД</button>
-        <button class="btn" onclick="openShop()">🛒 МАГАЗИН</button>
+        <button class="btn" id="dailyBtn">📦 ДЕЙЛИ</button>
+        <button class="btn" id="lbBtn">🏆 ЛИДЕРБОРД</button>
+        <button class="btn" id="shopBtn">🛒 МАГАЗИН</button>
     </div>
 
-    <div id="modal" class="modal" onclick="if(event.target === this) closeModal()">
-        <div class="modal-content" onclick="event.stopPropagation()">
-            <span class="close" onclick="closeModal()">&times;</span>
-            <div id="content"></div>
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeBtn">&times;</span>
+            <div id="modalBody"></div>
         </div>
     </div>
 
     <script>
-        // ===== GAME STATE =====
-        let game = {
-            balance: 1000,
-            mines: { 
-                opened: 0, 
-                mult: 1 
-            },
-            farm: { 
-                seeds: 1, 
-                plants: [] 
-            },
-            mining: { 
-                power: 0.01, 
-                energy: 100, 
-                lastTime: Date.now() 
-            },
-            cases: { 
-                spins: 0, 
-                stickers: { 
-                    common: 0, 
-                    gold: 0, 
-                    diamond: 0, 
-                    prismatic: 0 
-                } 
-            },
-            daily: 0,
-            streak: 1,
-            vip: '🟢 Бронза'
+        // STATE
+        let state = {
+            balance: parseInt(localStorage.getItem('balance')) || 1000,
+            mines_opened: parseInt(localStorage.getItem('mines_opened')) || 0,
+            mines_mult: parseFloat(localStorage.getItem('mines_mult')) || 1,
+            farm_seeds: parseInt(localStorage.getItem('farm_seeds')) || 1,
+            farm_plants: JSON.parse(localStorage.getItem('farm_plants')) || [],
+            mining_power: parseFloat(localStorage.getItem('mining_power')) || 0.01,
+            mining_energy: parseFloat(localStorage.getItem('mining_energy')) || 100,
+            mining_lastTime: parseInt(localStorage.getItem('mining_lastTime')) || Date.now(),
+            cases_spins: parseInt(localStorage.getItem('cases_spins')) || 0,
+            stickers_c: parseInt(localStorage.getItem('stickers_c')) || 0,
+            stickers_g: parseInt(localStorage.getItem('stickers_g')) || 0,
+            stickers_d: parseInt(localStorage.getItem('stickers_d')) || 0,
+            stickers_p: parseInt(localStorage.getItem('stickers_p')) || 0,
+            daily_last: parseInt(localStorage.getItem('daily_last')) || 0,
+            streak: parseInt(localStorage.getItem('streak')) || 1
         };
 
-        // ===== INIT =====
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
+        // SAVE
+        function save() {
+            localStorage.setItem('balance', state.balance);
+            localStorage.setItem('mines_opened', state.mines_opened);
+            localStorage.setItem('mines_mult', state.mines_mult);
+            localStorage.setItem('farm_seeds', state.farm_seeds);
+            localStorage.setItem('farm_plants', JSON.stringify(state.farm_plants));
+            localStorage.setItem('mining_power', state.mining_power);
+            localStorage.setItem('mining_energy', state.mining_energy);
+            localStorage.setItem('mining_lastTime', state.mining_lastTime);
+            localStorage.setItem('cases_spins', state.cases_spins);
+            localStorage.setItem('stickers_c', state.stickers_c);
+            localStorage.setItem('stickers_g', state.stickers_g);
+            localStorage.setItem('stickers_d', state.stickers_d);
+            localStorage.setItem('stickers_p', state.stickers_p);
+            localStorage.setItem('daily_last', state.daily_last);
+            localStorage.setItem('streak', state.streak);
+        }
 
-        load();
-        update();
+        // UPDATE UI
+        function update() {
+            document.getElementById('bal').textContent = `💎 ${fmt(state.balance)} TFY`;
+            document.getElementById('minesVal').textContent = `x${state.mines_mult.toFixed(2)}`;
+            document.getElementById('casesVal').textContent = fmt(100 + state.cases_spins * 3.5);
+            document.getElementById('miningVal').textContent = state.mining_power.toFixed(2);
+            
+            let farmTotal = state.farm_plants.reduce((a,p) => a + (p.gain || 0), 0) + state.mining_power * 1440;
+            document.getElementById('farmVal').textContent = fmt(farmTotal);
+            
+            let stickers = state.stickers_c + state.stickers_g + state.stickers_d + state.stickers_p;
+            let vip = '🟢 Бронза';
+            if(stickers >= 50) vip = '🌈 Легенда';
+            else if(stickers >= 20) vip = '🟣 Платина';
+            else if(stickers >= 5) vip = '🟡 Золото';
+            document.getElementById('vipStatus').textContent = vip;
+        }
 
-        // Game loop
+        // MINING LOOP
         setInterval(() => {
             let now = Date.now();
-            let mins = (now - game.mining.lastTime) / 60000;
+            let mins = (now - state.mining_lastTime) / 60000;
             if(mins > 0) {
-                game.balance += game.mining.power * mins;
-                game.mining.lastTime = now;
+                state.balance += state.mining_power * mins;
+                state.mining_lastTime = now;
+                save();
+                update();
             }
-            save();
-            update();
         }, 1000);
 
-        // ===== UPDATE FUNCTION =====
-        function update() {
-            try {
-                document.getElementById('balance').textContent = `💎 ${fmt(game.balance)} TFY`;
-                
-                let el = document.getElementById('minesMult');
-                if(el) el.textContent = `x${game.mines.mult.toFixed(2)}`;
-                
-                el = document.getElementById('casePrice');
-                if(el) el.textContent = `${fmt(100 + game.cases.spins * 3.5)} TFY`;
-                
-                let farmTotal = 0;
-                if(game.farm.plants && Array.isArray(game.farm.plants)) {
-                    farmTotal = game.farm.plants.reduce((a, p) => a + (p.gain || 0), 0);
-                }
-                farmTotal += game.mining.power * 1440;
-                
-                el = document.getElementById('farmInc');
-                if(el) el.textContent = `${fmt(farmTotal)} TFY`;
-                
-                el = document.getElementById('mineRate');
-                if(el) el.textContent = `${game.mining.power.toFixed(2)} TFY`;
-                
-                // Update VIP
-                let stickers = (game.cases.stickers.common || 0) + 
-                               (game.cases.stickers.gold || 0) + 
-                               (game.cases.stickers.diamond || 0) + 
-                               (game.cases.stickers.prismatic || 0);
-                
-                if(stickers >= 50) game.vip = '🌈 Легенда';
-                else if(stickers >= 20) game.vip = '🟣 Платина';
-                else if(stickers >= 5) game.vip = '🟡 Золото';
-                else game.vip = '🟢 Бронза';
-                
-                el = document.getElementById('vip');
-                if(el) el.textContent = game.vip;
-            } catch(e) {
-                console.log('Update error:', e);
-            }
+        // MODAL
+        function showModal(html) {
+            document.getElementById('modalBody').innerHTML = html;
+            document.getElementById('modal').style.display = 'block';
         }
 
-        // ===== MINES =====
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // MINES
         function openMines() {
-            let html = `<h2>🧨 MINES</h2>
-                <div class="info">
-                    Множитель: <strong>x${game.mines.mult.toFixed(2)}</strong> | Открыто: <strong>${game.mines.opened}/25</strong>
-                </div>
-                <div class="mines-grid" id="grid"></div>
-                <button class="btn" onclick="playMine()" ${game.mines.opened >= 5 ? 'disabled title="Слишком много открыто"' : ''}>ОТКРЫТЬ КЛЕТКУ (-25 TFY)</button>
-                <button class="btn" onclick="cashOutMines()" ${game.mines.opened === 0 ? 'disabled' : ''}>💰 CASH OUT (+${Math.floor(game.mines.mult * 25)} TFY)</button>
+            let html = `
+                <h2>🧨 MINES</h2>
+                <div class="info">x${state.mines_mult.toFixed(2)} | ${state.mines_opened}/25</div>
+                <div class="grid-5" id="minesGrid"></div>
+                <button class="btn" id="mineBtn">ОТКРЫТЬ (-25 TFY)</button>
+                <button class="btn" id="cashoutBtn" ${state.mines_opened === 0 ? 'disabled' : ''}>💰 CASH OUT</button>
             `;
-            show(html);
-            makeMineGrid();
-        }
-
-        function makeMineGrid() {
-            let grid = document.getElementById('grid');
-            if(!grid) return;
+            showModal(html);
+            
+            let grid = document.getElementById('minesGrid');
             grid.innerHTML = '';
             for(let i = 0; i < 25; i++) {
                 let t = document.createElement('div');
-                t.className = 'tile';
-                if(i < game.mines.opened) {
-                    t.classList.add('opened');
-                    t.textContent = '💎';
-                } else {
-                    t.textContent = '?';
-                }
+                t.className = i < state.mines_opened ? 'tile opened' : 'tile';
+                t.textContent = i < state.mines_opened ? '💎' : '?';
                 grid.appendChild(t);
             }
-        }
-
-        function playMine() {
-            if(game.balance < 25) { 
-                alert('❌ Нужно 25 TFY'); 
-                return; 
-            }
-            if(game.mines.opened >= 5) { 
-                alert('⚠️ Слишком много открыто!'); 
-                return; 
-            }
             
-            game.balance -= 25;
-            game.mines.opened++;
-            game.mines.mult = 1 + (game.mines.opened * 0.15);
-
-            let isBomb = Math.random() < 0.3;
-            
-            if(isBomb) {
-                alert('💥 ПОПАЛАСЬ МИНА! Игра заканчивается.');
-                game.mines = { opened: 0, mult: 1 };
-            } else {
-                if(Math.random() < 0.05) {
-                    alert('🎫 +1 КАРТА СОКРОВИЩ!');
+            document.getElementById('mineBtn').onclick = () => {
+                if(state.balance < 25) { alert('Нужно 25 TFY'); return; }
+                if(state.mines_opened >= 8) { alert('Слишком много!'); return; }
+                
+                state.balance -= 25;
+                state.mines_opened++;
+                state.mines_mult = 1 + state.mines_opened * 0.15;
+                
+                if(Math.random() < 0.25) {
+                    alert('💥 МИНА!');
+                    state.mines_opened = 0;
+                    state.mines_mult = 1;
+                } else {
+                    if(Math.random() < 0.05) alert('🎫 КАРТА!');
                 }
-            }
+                
+                save();
+                update();
+                openMines();
+            };
             
-            save();
-            update();
-            openMines();
+            document.getElementById('cashoutBtn').onclick = () => {
+                let win = Math.floor(state.mines_mult * 25);
+                state.balance += win;
+                alert(`💰 +${win} TFY`);
+                state.mines_opened = 0;
+                state.mines_mult = 1;
+                save();
+                update();
+                closeModal();
+            };
         }
 
-        function cashOutMines() {
-            if(game.mines.opened === 0) {
-                alert('⚠️ Ничего не открыто');
-                return;
-            }
-            let win = Math.floor(game.mines.mult * 25);
-            game.balance += win;
-            alert(`💰 ВЫИГРЫШ: +${win} TFY! (x${game.mines.mult.toFixed(2)})`);
-            game.mines = { opened: 0, mult: 1 };
-            save();
-            update();
-            closeModal();
-        }
-
-        // ===== FARM =====
+        // FARM
         function openFarm() {
-            let plantsHtml = '';
-            if(game.farm.plants && Array.isArray(game.farm.plants)) {
-                plantsHtml = game.farm.plants.map((p, idx) => 
-                    `<div class="farm-item">
-                        <span>${p.emoji || '🌿'} ${p.name || 'Кустик'}: +${p.gain || 50} TFY</span>
-                        <button class="btn farm-btn" onclick="harvestPlant(${idx})">Собрать</button>
-                    </div>`
-                ).join('');
-            }
-
-            if(!plantsHtml) {
-                plantsHtml = '<div style="text-align:center; opacity:0.7; padding:20px;">Нет растений. Посади семечко!</div>';
-            }
-
-            let html = `<h2>🌿 WEED FARM</h2>
-                <div class="info">
-                    Семечек: <strong>${game.farm.seeds}/1</strong>
-                    <button class="btn btn-small" onclick="plantSeed()" ${game.farm.seeds < 1 ? 'disabled' : ''}>🌱 Посадить</button>
+            let plantsHtml = state.farm_plants.map((p, i) => 
+                `<div class="farm-item"><span>${p.emoji} +${p.gain}</span><button class="btn btn-sm" onclick="window.harvestPlant(${i})">Собрать</button></div>`
+            ).join('') || '<div style="text-align:center; opacity:0.7;">Нет растений</div>';
+            
+            let html = `
+                <h2>🌿 FARM</h2>
+                <div class="info">Семечек: ${state.farm_seeds}/1
+                    <button class="btn btn-sm" id="plantBtn" ${state.farm_seeds < 1 ? 'disabled' : ''}>Посадить</button>
                 </div>
-                <div>${plantsHtml}</div>
+                <div class="farm-list">${plantsHtml}</div>
             `;
-            show(html);
+            showModal(html);
+            
+            document.getElementById('plantBtn').onclick = () => {
+                if(state.farm_seeds < 1) return;
+                state.farm_seeds = 0;
+                state.farm_plants.push({ emoji: '🌿', gain: 50 });
+                alert('🌱 Посажено!');
+                save();
+                update();
+                openFarm();
+            };
         }
 
-        function plantSeed() {
-            if(game.farm.seeds < 1) {
-                alert('❌ Нет семечек');
-                return;
-            }
-            
-            game.farm.seeds = 0;
-            if(!Array.isArray(game.farm.plants)) {
-                game.farm.plants = [];
-            }
-            game.farm.plants.push({ 
-                emoji: '🌿', 
-                name: 'Кустик Auto', 
-                gain: 50 
-            });
-            
-            alert('🌱 Посажено! Будет готово через 24ч');
+        window.harvestPlant = function(i) {
+            state.balance += state.farm_plants[i].gain;
+            state.farm_plants.splice(i, 1);
+            state.farm_seeds = 1;
+            alert(`✅ +${state.farm_plants[i]?.gain || 50} TFY`);
             save();
             update();
             openFarm();
-        }
+        };
 
-        function harvestPlant(idx) {
-            if(!game.farm.plants || !game.farm.plants[idx]) {
-                alert('❌ Растение не найдено');
-                return;
-            }
-            
-            let gain = game.farm.plants[idx].gain || 50;
-            game.balance += gain;
-            game.farm.plants.splice(idx, 1);
-            game.farm.seeds = 1;
-            
-            alert(`✅ Урожай собран: +${gain} TFY`);
-            save();
-            update();
-            openFarm();
-        }
-
-        // ===== MINING =====
+        // MINING
         function openMining() {
-            let html = `<h2>⛏️ MINING TYCOON</h2>
+            let html = `
+                <h2>⛏️ MINING</h2>
                 <div class="info">
-                    <div>RIG #1: <strong>${game.mining.power.toFixed(2)} TFY/мин</strong></div>
-                    <div style="margin:10px 0;">Энергия: <strong>${game.mining.energy.toFixed(0)}%</strong></div>
-                    <div class="progress"><div class="progress-bar" style="width:${Math.min(100, game.mining.energy)}%"></div></div>
-                    <button class="btn" onclick="restartMine()" ${game.mining.energy > 95 ? 'disabled' : ''}>▶️ ЗАПУСТИТЬ</button>
-                </div>
-                <div class="stats">
-                    <div class="stat-item">💻 GPU<br><span style="color: #ffd700;">3.75K TFY</span></div>
-                    <div class="stat-item">❄️ Водянка<br><span style="color: #ffd700;">12K TFY</span></div>
+                    <div>${state.mining_power.toFixed(2)} TFY/мин</div>
+                    <div>Энергия: ${state.mining_energy.toFixed(0)}%</div>
+                    <button class="btn" id="restartBtn">▶️ ЗАПУСТИТЬ</button>
                 </div>
             `;
-            show(html);
+            showModal(html);
+            
+            document.getElementById('restartBtn').onclick = () => {
+                state.mining_energy = 100;
+                state.mining_lastTime = Date.now();
+                alert('⛏️ Запущено!');
+                save();
+                update();
+                openMining();
+            };
         }
 
-        function restartMine() {
-            game.mining.energy = 100;
-            game.mining.lastTime = Date.now();
-            alert('⛏️ Майнинг запущен! Энергия восстановлена.');
-            save();
-            update();
-            openMining();
-        }
-
-        // ===== CASES =====
+        // CASES
         function openCases() {
-            let price = Math.floor(100 + game.cases.spins * 3.5);
-            let html = `<h2>🎡 NFT CASES</h2>
+            let price = Math.floor(100 + state.cases_spins * 3.5);
+            let html = `
+                <h2>🎡 CASES</h2>
                 <div class="info">
-                    <div>Прокрутка #${game.cases.spins + 1}</div>
-                    <div style="font-size:18px; margin:10px 0; color:#ffd700;"><strong>${fmt(price)} TFY</strong></div>
-                    <div style="font-size:12px; opacity:0.8;">🟢 68% | 🟡 24% | 🟣 6% | 🌈 2%</div>
-                    <div style="font-size:48px; margin:20px 0;">🎡</div>
-                    <button class="btn" onclick="openCase()">🔓 ОТКРЫТЬ КЕЙС</button>
+                    <div>#${state.cases_spins + 1}</div>
+                    <div>${fmt(price)} TFY</div>
+                    <button class="btn" id="openBtn">🔓 ОТКРЫТЬ</button>
                 </div>
-                <div class="stats">
-                    <div class="stat-item">🟢 ${game.cases.stickers.common || 0}</div>
-                    <div class="stat-item">🟡 ${game.cases.stickers.gold || 0}</div>
-                    <div class="stat-item">🟣 ${game.cases.stickers.diamond || 0}</div>
-                    <div class="stat-item">🌈 ${game.cases.stickers.prismatic || 0}</div>
+                <div class="stat-grid">
+                    <div class="stat">🟢 ${state.stickers_c}</div>
+                    <div class="stat">🟡 ${state.stickers_g}</div>
+                    <div class="stat">🟣 ${state.stickers_d}</div>
+                    <div class="stat">🌈 ${state.stickers_p}</div>
                 </div>
             `;
-            show(html);
+            showModal(html);
+            
+            document.getElementById('openBtn').onclick = () => {
+                if(state.balance < price) { alert(`Нужно ${fmt(price)}`); return; }
+                state.balance -= price;
+                state.cases_spins++;
+                
+                let r = Math.random();
+                let type;
+                if(r < 0.68) { type = 'c'; alert('🟢'); state.stickers_c++; }
+                else if(r < 0.92) { type = 'g'; alert('🟡'); state.stickers_g++; }
+                else if(r < 0.98) { type = 'd'; alert('🟣'); state.stickers_d++; }
+                else { type = 'p'; alert('🌈'); state.stickers_p++; }
+                
+                save();
+                update();
+                openCases();
+            };
         }
 
-        function openCase() {
-            let price = Math.floor(100 + game.cases.spins * 3.5);
-            if(game.balance < price) { 
-                alert(`❌ Нужно ${fmt(price)} TFY`); 
-                return; 
-            }
-            
-            game.balance -= price;
-            game.cases.spins++;
-            
-            let r = Math.random();
-            let type, name, bonus;
-            
-            if(r < 0.68) {
-                type = 'common';
-                name = '🟢 Обычная';
-                bonus = 1;
-            } else if(r < 0.92) {
-                type = 'gold';
-                name = '🟡 Золотая';
-                bonus = 5;
-            } else if(r < 0.98) {
-                type = 'diamond';
-                name = '🟣 Бриллиантовая';
-                bonus = 25;
-            } else {
-                type = 'prismatic';
-                name = '🌈 Призматическая';
-                bonus = 100;
-            }
-            
-            game.cases.stickers[type]++;
-            alert(`🎉 ${name}!\n+${bonus}% к доходу`);
-            save();
-            update();
-            openCases();
-        }
-
-        // ===== DAILY =====
+        // DAILY
         function openDaily() {
             let now = Date.now();
-            let canClaim = (now - game.daily) > 86400000;
+            let canClaim = (now - state.daily_last) > 86400000;
             
-            let html = `<h2>📦 ДЕЙЛИ БОНУС</h2>
+            let html = canClaim ? `
+                <h2>📦 ДЕЙЛИ</h2>
                 <div class="info">
-                    ${canClaim ? `
-                        <div style="margin:20px 0;">
-                            <strong>Награда:</strong><br>
-                            <span style="font-size:20px; color:#ffd700;">+${50 * game.streak} TFY</span>
-                        </div>
-                        <div>Стрик: <strong>${game.streak}/30</strong></div>
-                        <button class="btn" onclick="claimDaily()">✅ ПОЛУЧИТЬ</button>
-                    ` : `
-                        <div style="opacity:0.7;">
-                            ⏰ Доступно завтра
-                        </div>
-                    `}
+                    <div style="font-size:20px; color:#ffd700;">+${50 * state.streak} TFY</div>
+                    <div>Стрик: ${state.streak}/30</div>
+                    <button class="btn" id="claimBtn">✅ ПОЛУЧИТЬ</button>
                 </div>
+            ` : `
+                <h2>📦 ДЕЙЛИ</h2>
+                <div class="info">Доступно завтра</div>
             `;
-            show(html);
-        }
-
-        function claimDaily() {
-            let bonus = 50 * game.streak;
-            game.balance += bonus;
-            game.daily = Date.now();
-            game.streak = Math.min(game.streak + 1, 30);
-            game.farm.seeds = 1;
             
-            alert(`📦 +${bonus} TFY!\nСтрик: ${game.streak}/30`);
-            save();
-            update();
-            closeModal();
+            showModal(html);
+            
+            if(canClaim) {
+                document.getElementById('claimBtn').onclick = () => {
+                    state.balance += 50 * state.streak;
+                    state.daily_last = Date.now();
+                    state.streak = Math.min(state.streak + 1, 30);
+                    state.farm_seeds = 1;
+                    alert(`📦 +${50 * state.streak} TFY`);
+                    save();
+                    update();
+                    closeModal();
+                };
+            }
         }
 
-        // ===== LEADERBOARD =====
+        // LEADERBOARD
         function openLeaderboard() {
             let leaders = [
                 { name: '@crypto_king', score: 125000 },
                 { name: '@weedlord', score: 87450 },
                 { name: '@minerpro', score: 45230 },
-                { name: '@lazylucker', score: Math.floor(game.balance) }
+                { name: '@you', score: state.balance }
             ].sort((a,b) => b.score - a.score);
             
-            let html = `<h2>🏆 ЛИДЕРБОРД</h2><div class="leaderboard">`;
+            let html = '<h2>🏆 ЛИДЕРБОРД</h2><div class="lb-list">';
             let medals = ['🥇', '🥈', '🥉'];
             leaders.forEach((l, i) => {
-                html += `<div class="lb-item"><span>${medals[i] || (i+1)+'.'} ${l.name}</span><span>${fmt(l.score)} TFY</span></div>`;
+                html += `<div class="lb-item"><span>${medals[i] || i+1}. ${l.name}</span><span>${fmt(l.score)}</span></div>`;
             });
             html += '</div>';
-            show(html);
+            
+            showModal(html);
         }
 
-        // ===== SHOP =====
+        // SHOP
         function openShop() {
-            let html = `<h2>🛒 NFT МАГАЗИН</h2>
-                <div class="stats">
-                    <div class="stat-item">🟡 Золотой PM<br><span style="color: #ffd700;">5,000 TFY</span></div>
-                    <div class="stat-item">💎 Брилл. Косяк<br><span style="color: #ffd700;">25,000 TFY</span></div>
-                    <div class="stat-item">👑 Королевский Риг<br><span style="color: #ffd700;">100,000 TFY</span></div>
-                    <div class="stat-item">🌈 Легенда<br><span style="color: #ffd700;">500,000 TFY</span></div>
+            let html = `
+                <h2>🛒 МАГАЗИН</h2>
+                <div class="stat-grid">
+                    <div class="stat">🟡<br>5K TFY</div>
+                    <div class="stat">💎<br>25K TFY</div>
+                    <div class="stat">👑<br>100K TFY</div>
+                    <div class="stat">🌈<br>500K TFY</div>
                 </div>
             `;
-            show(html);
+            showModal(html);
         }
 
-        // ===== UTILS =====
-        function show(html) {
-            let el = document.getElementById('content');
-            if(el) el.innerHTML = html;
-            let modal = document.getElementById('modal');
-            if(modal) modal.style.display = 'block';
-        }
-
-        function closeModal() {
-            let modal = document.getElementById('modal');
-            if(modal) modal.style.display = 'none';
-        }
-
+        // UTILS
         function fmt(n) {
             if(n >= 1000000) return (n/1000000).toFixed(1) + 'M';
             if(n >= 1000) return (n/1000).toFixed(1) + 'K';
             return Math.floor(n).toString();
         }
 
-        function save() {
-            try {
-                localStorage.setItem('tfy', JSON.stringify(game));
-            } catch(e) {
-                console.log('Save error:', e);
-            }
-        }
+        // INIT
+        Telegram.WebApp.ready();
+        Telegram.WebApp.expand();
 
-        function load() {
-            try {
-                let saved = localStorage.getItem('tfy');
-                if(saved) {
-                    let loaded = JSON.parse(saved);
-                    game = Object.assign(game, loaded);
-                }
-                game.mining.lastTime = Date.now();
-            } catch(e) {
-                console.log('Load error:', e);
-            }
-        }
+        document.getElementById('minesCard').onclick = openMines;
+        document.getElementById('farmCard').onclick = openFarm;
+        document.getElementById('miningCard').onclick = openMining;
+        document.getElementById('casesCard').onclick = openCases;
+        document.getElementById('dailyBtn').onclick = openDaily;
+        document.getElementById('lbBtn').onclick = openLeaderboard;
+        document.getElementById('shopBtn').onclick = openShop;
+        document.getElementById('closeBtn').onclick = closeModal;
+        document.getElementById('modal').onclick = (e) => { if(e.target === this) closeModal(); };
+
+        update();
     </script>
 </body>
 </html>
