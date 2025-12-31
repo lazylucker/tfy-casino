@@ -6,11 +6,7 @@
     <title>TFY Casino - Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -23,7 +19,6 @@
             margin: 0 auto;
             padding: 20px;
             min-height: 100vh;
-            position: relative;
         }
         .header {
             text-align: center;
@@ -34,22 +29,9 @@
             backdrop-filter: blur(10px);
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
-        .balance {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
-        }
-        .vip-status {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
+        .balance { font-size: 24px; font-weight: bold; margin-bottom: 10px; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .vip-status { font-size: 14px; opacity: 0.9; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
         .card {
             background: rgba(255,255,255,0.15);
             padding: 20px;
@@ -65,19 +47,9 @@
             background: rgba(255,255,255,0.25);
             box-shadow: 0 15px 40px rgba(0,0,0,0.4);
         }
-        .card-icon {
-            font-size: 32px;
-            margin-bottom: 10px;
-        }
-        .card-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .card-value {
-            font-size: 18px;
-            color: #ffd700;
-        }
+        .card-icon { font-size: 32px; margin-bottom: 10px; }
+        .card-title { font-size: 16px; font-weight: bold; margin-bottom: 5px; }
+        .card-value { font-size: 18px; color: #ffd700; }
         .btn {
             background: linear-gradient(45deg, #ff6b6b, #feca57);
             border: none;
@@ -92,15 +64,8 @@
             margin: 10px 0;
             box-shadow: 0 8px 25px rgba(254,202,87,0.4);
         }
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(254,202,87,0.6);
-        }
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 35px rgba(254,202,87,0.6); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
         .modal {
             display: none;
             position: fixed;
@@ -156,14 +121,8 @@
             transform: scale(1.05);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
-        .mine-tile.opened {
-            background: #f0f0f0;
-            color: #333;
-        }
-        .mine-tile.bomb {
-            background: #ff4444 !important;
-            animation: shake 0.5s;
-        }
+        .mine-tile.opened { background: #f0f0f0; color: #333; }
+        .mine-tile.bomb { background: #ff4444 !important; animation: shake 0.5s; }
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
             25% { transform: translateX(-5px); }
@@ -182,17 +141,8 @@
             background: linear-gradient(90deg, #4facfe, #00f2fe);
             transition: width 0.3s ease;
         }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        .leaderboard {
-            max-height: 300px;
-            overflow-y: auto;
-        }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; font-size: 14px; }
+        .leaderboard { max-height: 300px; overflow-y: auto; }
         .leaderboard-item {
             display: flex;
             justify-content: space-between;
@@ -201,12 +151,13 @@
             margin-bottom: 5px;
             border-radius: 10px;
         }
-        .wheel-spin {
-            animation: spin 2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(1440deg); }
+        .farm-plant {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0,255,0,0.2);
+            margin: 5px 0;
+            border-radius: 10px;
         }
         .rarity-common { color: #90EE90; }
         .rarity-gold { color: #FFD700; }
@@ -220,14 +171,12 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
         <div class="header">
             <h1>🎰 TFY CASINO</h1>
             <div class="balance" id="balance">💎 1,000 TFY</div>
             <div class="vip-status" id="vipStatus">🟢 Бронза</div>
         </div>
 
-        <!-- Main Grid -->
         <div class="grid">
             <div class="card" onclick="showGame('mines')">
                 <div class="card-icon">🧨</div>
@@ -251,7 +200,6 @@
             </div>
         </div>
 
-        <!-- Passive Income -->
         <div class="card" style="grid-column: span 2;">
             <div class="card-title">📈 Пассивный доход</div>
             <div class="card-value" id="passiveIncome">89 TFY/день</div>
@@ -260,13 +208,11 @@
             </div>
         </div>
 
-        <!-- Action Buttons -->
         <button class="btn" onclick="showGame('shop')">🛒 NFT Магазин</button>
         <button class="btn" onclick="showGame('leaderboard')">🏆 Лидерборд</button>
         <button class="btn" onclick="claimDaily()">📦 Дейли бонус</button>
     </div>
 
-    <!-- Modals -->
     <div id="gameModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -275,7 +221,6 @@
     </div>
 
     <script>
-        // Game Data
         let gameData = {
             balance: 1000,
             mines: { opened: 0, bombs: 5, size: 25, multiplier: 1 },
@@ -288,18 +233,15 @@
             vip: 'bronze'
         };
 
-        // Telegram WebApp
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
 
-        // Init
         function init() {
             loadData();
             updateUI();
             setInterval(updateUI, 1000);
         }
 
-        // Update UI
         function updateUI() {
             document.getElementById('balance').textContent = `💎 ${formatNumber(gameData.balance)} TFY`;
             document.getElementById('vipStatus').textContent = getVipStatus();
@@ -309,7 +251,6 @@
             document.getElementById('energyBar').style.width = `${Math.min(gameData.mining.rigs[0].energy, 100)}%`;
         }
 
-        // Show Game Modal
         function showGame(game) {
             const content = document.getElementById('gameContent');
             document.getElementById('gameModal').style.display = 'block';
@@ -320,18 +261,42 @@
                         <h2>🧨 MINES</h2>
                         <div>Мины: ${gameData.mines.bombs}/${gameData.mines.size} | Множитель: x${gameData.mines.multiplier.toFixed(2)}</div>
                         <div class="mines-grid" id="minesGrid"></div>
-                        <div style="margin: 20px 0;">
+                        <div>
                             <button class="btn" onclick="playMines()">Открыть клетку (25 TFY)</button>
                             <button class="btn" onclick="cashOutMines()">💰 Cash Out (+${Math.floor(gameData.mines.multiplier * 25)} TFY)</button>
                         </div>
                     `;
                     createMinesGrid();
                     break;
+                case 'farm':
+                    content.innerHTML = `
+                        <h2>🌿 WEED FARM</h2>
+                        <div>Семечек: ${gameData.farm.seeds}/1 <button class="btn" onclick="claimSeed()">📦 Получить</button></div>
+                        <div id="farmPlants"></div>
+                        <div class="stats-grid">
+                            <div>💧 Полив <span style="color: gold;">750 TFY</span></div>
+                            <div>☀️ Свет <span style="color: gold;">2.25K TFY</span></div>
+                        </div>
+                    `;
+                    updateFarmUI();
+                    break;
+                case 'mining':
+                    content.innerHTML = `
+                        <h2>⛏️ MINING TYCOON</h2>
+                        <div>RIG #1: ${gameData.mining.rigs[0].power.toFixed(2)} TFY/мин</div>
+                        <div>Энергия: ${gameData.mining.rigs[0].energy.toFixed(0)}%</div>
+                        <button class="btn" onclick="startMining()">▶️ START</button>
+                        <div class="stats-grid">
+                            <div>💻 GPU <span style="color: gold;">3.75K TFY</span></div>
+                            <div>❄️ Водянка <span style="color: gold;">12K TFY</span></div>
+                        </div>
+                    `;
+                    break;
                 case 'cases':
                     content.innerHTML = `
                         <h2>🎡 NFT CASES</h2>
                         <div>Прокрутка #${gameData.cases.spins + 1} | Цена: ${formatNumber(getCasePrice())} TFY</div>
-                        <div style="font-size: 12px; margin: 10px 0;">🟢68% 🟡24% 🟣6% 🌈2%</div>
+                        <div style="font-size: 12px;">🟢68% 🟡24% 🟣6% 🌈2%</div>
                         <div style="text-align: center; margin: 20px 0;">
                             <div style="font-size: 48px; animation: spin 2s infinite linear;">🎡</div>
                         </div>
@@ -341,6 +306,17 @@
                             <div>🟡 ${gameData.cases.stickers.gold}</div>
                             <div>🟣 ${gameData.cases.stickers.diamond}</div>
                             <div>🌈 ${gameData.cases.stickers.prismatic}</div>
+                        </div>
+                    `;
+                    break;
+                case 'shop':
+                    content.innerHTML = `
+                        <h2>🛒 NFT МАГАЗИН</h2>
+                        <div class="stats-grid">
+                            <div>🟡 Золотой PM<br><span style="color: gold;">5,000 TFY</span></div>
+                            <div>💎 Брилл. Косяк<br><span style="color: gold;">25,000 TFY</span></div>
+                            <div>👑 Королевский Риг<br><span style="color: gold;">100,000 TFY</span></div>
+                            <div>🌈 Легенда<br><span style="color: gold;">500,000 TFY</span></div>
                         </div>
                     `;
                     break;
@@ -354,7 +330,6 @@
             }
         }
 
-        // Mines Game
         function createMinesGrid() {
             const grid = document.getElementById('minesGrid');
             grid.innerHTML = '';
@@ -368,7 +343,6 @@
 
         function openMineTile(index) {
             if(gameData.balance < 25) return alert('Недостаточно TFY!');
-            
             gameData.balance -= 25;
             gameData.mines.opened++;
             gameData.mines.multiplier = 1 + (gameData.mines.opened * 0.15);
@@ -384,11 +358,7 @@
             } else {
                 tile.className = 'mine-tile opened';
                 tile.textContent = '💎';
-                
-                // Treasure card drop (2% chance)
-                if(Math.random() < 0.02) {
-                    alert('🎫 КАРТА СОКРОВИЩ! +1');
-                }
+                if(Math.random() < 0.02) alert('🎫 КАРТА СОКРОВИЩ! +1');
             }
             saveData();
             updateUI();
@@ -404,7 +374,6 @@
             updateUI();
         }
 
-        // Cases
         function getCasePrice() {
             return 100 + (gameData.cases.spins * 3.5);
         }
@@ -412,7 +381,6 @@
         function openCase() {
             const price = getCasePrice();
             if(gameData.balance < price) return alert('Недостаточно TFY!');
-            
             gameData.balance -= price;
             gameData.cases.spins++;
             
@@ -421,14 +389,17 @@
             const rand = Math.random();
             let rarity = 'common';
             
-            if(rand < chances[0]) rarity = 'common';
-            else if(rand < chances[0] + chances[1]) rarity = 'gold';
-            else if(rand < chances[0] + chances[1] + chances[2]) rarity = 'diamond';
-            else rarity = 'prismatic';
+            let sum = 0;
+            for(let i = 0; i < chances.length; i++) {
+                sum += chances[i];
+                if(rand < sum) {
+                    rarity = rarities[i];
+                    break;
+                }
+            }
             
             gameData.cases.stickers[rarity]++;
             alert(`🎉 ${getRarityName(rarity).toUpperCase()} НАКЛЕЙКА!`);
-            
             saveData();
             updateUI();
         }
@@ -443,24 +414,45 @@
             return names[rarity];
         }
 
-        // Daily Bonus
         function claimDaily() {
             const now = Date.now();
             if(now - gameData.lastDaily < 86400000) {
                 return alert('Дейли уже получен! Завтра снова!');
             }
-            
             gameData.balance += 50 * gameData.dailyStreak;
             gameData.lastDaily = now;
             gameData.dailyStreak = Math.min(gameData.dailyStreak + 1, 30);
             gameData.farm.seeds = Math.min(gameData.farm.seeds + 1, 1);
-            
             alert(`📦 ДЕЙЛИ: +${50 * gameData.dailyStreak} TFY (стрик: ${gameData.dailyStreak})`);
             saveData();
             updateUI();
         }
 
-        // Leaderboard
+        function claimSeed() {
+            gameData.farm.seeds = 1;
+            alert('🌱 Семечко получено!');
+            saveData();
+            updateFarmUI();
+        }
+
+        function updateFarmUI() {
+            const plantsDiv = document.getElementById('farmPlants');
+            plantsDiv.innerHTML = gameData.farm.plants.map(p => `
+                <div class="farm-plant">
+                    <span>${p.emoji}</span>
+                    <span>${p.name} ⏳${p.timeLeft}h → ${p.income} TFY</span>
+                    <button class="btn" onclick="collectFarm(${p.index})" style="padding: 5px 10px; font-size: 12px;">Собрать</button>
+                </div>
+            `).join('') || '<div>Нет растений</div>';
+        }
+
+        function startMining() {
+            gameData.mining.rigs[0].energy = 100;
+            alert('⛏️ Майнинг запущен!');
+            saveData();
+            updateUI();
+        }
+
         function showLeaderboard() {
             const list = document.getElementById('leaderboardList');
             const demoData = [
@@ -469,7 +461,6 @@
                 { name: '@minerpro', score: 45230, vip: '🟡' },
                 { name: '@ТЫ', score: gameData.balance, vip: getVipStatus().slice(0,2) }
             ];
-            
             list.innerHTML = demoData.map((player, i) => `
                 <div class="leaderboard-item">
                     <span>${['🥇','🥈','🥉'][i] || `${i+1}.`} ${player.name} ${player.vip}</span>
@@ -478,7 +469,6 @@
             `).join('');
         }
 
-        // Utils
         function formatNumber(num) {
             if(num >= 1000) return (num/1000).toFixed(1) + 'K';
             return num.toString();
@@ -492,23 +482,13 @@
             return '🟢 Бронза';
         }
 
-        // Storage
-        function saveData() {
-            localStorage.setItem('tfyCasino', JSON.stringify(gameData));
-        }
-
+        function saveData() { localStorage.setItem('tfyCasino', JSON.stringify(gameData)); }
         function loadData() {
             const saved = localStorage.getItem('tfyCasino');
-            if(saved) {
-                gameData = { ...gameData, ...JSON.parse(saved) };
-            }
+            if(saved) gameData = { ...gameData, ...JSON.parse(saved) };
         }
+        function closeModal() { document.getElementById('gameModal').style.display = 'none'; }
 
-        function closeModal() {
-            document.getElementById('gameModal').style.display = 'none';
-        }
-
-        // Init
         init();
     </script>
 </body>
